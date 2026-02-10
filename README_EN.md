@@ -6,15 +6,7 @@ CeramiCraft is a microservices-based e-commerce platform for ceramic crafts, sup
 
 ```
 ceramicraft-deploy/
-├── fe-mer/                    # Merchant Frontend (Vue.js)
-├── fe-cus/                    # Customer Frontend (Vue.js)  
-├── ms-user/                   # User Microservice (Go)
-├── ms-order/                  # Order Microservice (Go)
-├── ms-pay/                    # Payment Microservice (Go)
-├── ms-cmdt/                   # Commodity Microservice (Go)
-├── ms-comt/                   # Comment Microservice (Go)
 ├── monitor-serv/              # Monitoring Environment Configuration
-├── nginx/                     # Nginx Configuration
 ├── mysql/                     # MySQL Initialization Scripts
 └── docker-compose.yml         # Production Docker Compose File
 ```
@@ -33,30 +25,11 @@ Ensure your system has the following software installed:
 
 ```bash
 # Clone the main project repository
-git clone https://github.com/NUS-ISS-Agile-Team/ceramicraft-deploy.git
+git clone https://github.com/sw5005-sus/ceramicraft-deploy.git
 cd ceramicraft-deploy
 ```
 
-### 2. Download Submodules
-
-```bash
-# Initialize and update all submodules
-git submodule update --init --recursive
-
-# Pull latest updates for submodules if needed
-git submodule update --remote --recursive
-```
-
-**Submodule Description:**
-- `fe-mer`: Merchant management frontend
-- `fe-cus`: Customer shopping frontend
-- `ms-user`: User management microservice
-- `ms-order`: Order processing microservice
-- `ms-pay`: Payment processing microservice
-- `ms-cmdt`: Commodity management microservice
-- `ms-comt`: Comment management microservice
-
-### 3. One-Click Deployment
+### 2. One-Click Deployment
 
 ```bash
 # Build and start all services
@@ -69,30 +42,6 @@ docker-compose ps
 docker-compose logs -f
 ```
 
-## 📊 Service Access
-
-After successful deployment, you can access services through when the Local Domain Resolution been configured:
-
-| Service | Access URL | Description |
-|---------|------------|-------------|
-| Merchant Frontend | http://ceramicraft-merchant-frontend | Merchant management interface |
-| Customer Frontend | http://ceramicraft-customer-frontend | Customer shopping interface |
-
-### Configure Local Domain Resolution
-
-For a better local development experience, you can add the following entries to your `/etc/hosts` file:
-
-```bash
-# macOS/Linux
-sudo echo "127.0.0.1 ceramicraft-merchant-frontend" >> /etc/hosts
-sudo echo "127.0.0.1 ceramicraft-customer-frontend" >> /etc/hosts
-
-# Windows (Administrator privileges required)
-# Edit C:\Windows\System32\drivers\etc\hosts file
-127.0.0.1 ceramicraft-merchant-frontend
-127.0.0.1 ceramicraft-customer-frontend
-```
-
 ## 🛠️ Development and Debugging
 
 ### View Real-time Logs
@@ -102,7 +51,6 @@ sudo echo "127.0.0.1 ceramicraft-customer-frontend" >> /etc/hosts
 docker-compose logs -f
 
 # View specific service logs
-docker-compose logs -f ceramicraft-user-mservice
 docker-compose logs -f mysql
 ```
 
@@ -113,7 +61,7 @@ docker-compose logs -f mysql
 docker-compose restart
 
 # Restart specific service
-docker-compose restart ceramicraft-user-mservice
+docker-compose restart mysql
 ```
 
 ### Rebuild Services
@@ -123,8 +71,8 @@ docker-compose restart ceramicraft-user-mservice
 docker-compose up -d --build
 
 # Rebuild specific service
-docker-compose build ceramicraft-user-mservice
-docker-compose up -d ceramicraft-user-mservice
+docker-compose build mysql
+docker-compose up -d mysql
 ```
 
 ## Environment Cleanup
@@ -161,9 +109,6 @@ docker-compose down --rmi all
 ```bash
 # Update main project
 git pull origin main
-
-# Update all submodules to latest version
-git submodule update --remote --recursive
 
 # Rebuild and deploy
 docker-compose up -d --build

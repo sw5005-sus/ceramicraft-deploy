@@ -1,34 +1,9 @@
 services:
-  ceramicraft-merchant-frontend:
-    build: fe-mer
-    container_name: ceramicraft-merchant-frontend
-    restart: unless-stopped
-  ceramicraft-customer-frontend:
-    build: fe-cus
-    container_name: ceramicraft-customer-frontend
-    restart: unless-stopped
-  nginx:
-    image: nginx:alpine
-    container_name: nginx-container
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-    depends_on:
-      - ceramicraft-user-mservice
-      - ceramicraft-product-mservice
-      - ceramicraft-order-mservice
-      - ceramicraft-payment-mservice
-      - ceramicraft-comment-mservice
-      - ceramicraft-merchant-frontend
-      - ceramicraft-customer-frontend
-    restart: unless-stopped
   mysql:
     image: mysql:8.0
     container_name: mysql-container
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
@@ -36,68 +11,11 @@ services:
       - ./mysql:/docker-entrypoint-initdb.d
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       timeout: 20s
       retries: 10
       interval: 20s
       start_period: 30s
-  ceramicraft-user-mservice:
-    build: ms-user/server
-    container_name: ceramicraft-user-mservice
-    env_file:
-      - env-file
-    depends_on:
-      mysql:
-        condition: service_healthy
-    restart: unless-stopped
-  ceramicraft-product-mservice:
-    build: ms-cmdt/server
-    container_name: ceramicraft-product-mservice
-    env_file:
-      - env-file
-    depends_on:
-      mysql:
-        condition: service_healthy
-    restart: unless-stopped
-  ceramicraft-order-mservice:
-    build: ms-order/server
-    container_name: ceramicraft-order-mservice
-    env_file:
-      - env-file
-    depends_on:
-      mysql:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-  ceramicraft-payment-mservice:
-    build: ms-pay/server
-    container_name: ceramicraft-payment-mservice
-    env_file:
-      - env-file
-    depends_on:
-      mysql:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-  ceramicraft-comment-mservice:
-    build: ms-comt/server
-    container_name: ceramicraft-comment-mservice
-    env_file:
-      - env-file
-    depends_on:
-      mysql:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
   kafka:
     image: confluentinc/cp-kafka:8.1.0
     container_name: kafka-container
@@ -105,9 +23,9 @@ services:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://172.31.2.221:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,EXTERNAL://${KAFKA_HOST_IP}:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -119,6 +37,7 @@ services:
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
     ports:
       - "9092:9092"
+      - "29092:29092"
     volumes:
       - kafka_data:/var/lib/kafka/data
     restart: unless-stopped
