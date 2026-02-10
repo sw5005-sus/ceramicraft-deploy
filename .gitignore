@@ -1,0 +1,144 @@
+# ==============================
+# ArgoCD 专属忽略项
+# ==============================
+
+# ArgoCD CLI 生成的临时文件
+argocd.log
+argocd-session
+
+# ArgoCD 应用状态缓存（由 argocd app diff 生成）
+.diff/
+
+# ArgoCD 本地开发环境（如使用 argo-cd-local-dev）
+local-dev/
+*.local.yaml
+*-local.yaml
+
+# ==============================
+# Kubernetes & Helm 忽略项
+# ==============================
+
+# Helm 生成的 charts 目录（应使用 helm dependency update 管理）
+charts/
+
+# Helm 本地 values 覆盖文件（敏感信息）
+values-*.yaml
+!values.yaml          # 保留主 values.yaml
+!values-production.yaml  # 显式保留生产环境 values（按需调整）
+!values-staging.yaml
+
+# Helm 临时文件
+.helm/
+
+# Kustomize 生成的临时文件
+kustomize_*.yaml
+
+# Kubernetes 临时/调试文件
+*.kubeconfig
+.kube/
+kubeconfig*
+
+# ==============================
+# 敏感信息 & 安全
+# ==============================
+
+# 密钥/凭证文件（必须忽略！）
+secrets.yaml
+*secret*.yaml
+*password*.yaml
+*token*.yaml
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.cert
+
+# SOPS 加密文件的临时解密副本
+*.yaml.dec
+*.json.dec
+
+# External Secrets Operator 生成的 Secret
+# （实际使用 ExternalSecret 资源，Secret 由控制器生成）
+# *.secret.yaml
+
+# ==============================
+# 本地开发 & 测试
+# ==============================
+
+# 本地集群配置（k3d/kind/minikube）
+k3d-*.yaml
+kind-*.yaml
+minikube-profiles/
+
+# Tilt / Skaffold 本地配置
+tilt_modules/
+tilt_modules.txt
+skaffold.yaml.local
+skaffold-debug.yaml
+
+# 本地覆盖配置（开发环境专用）
+*-dev.yaml
+*-local.yaml
+override.yaml
+local-override.yaml
+
+# 测试生成的文件
+test-output/
+*.test.yaml
+*_test.yaml
+
+# ==============================
+# 通用开发工具
+# ==============================
+
+# IDE / 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.temp
+*~
+
+# 日志文件
+*.log
+logs/
+log/
+
+# 构建产物
+dist/
+build/
+out/
+target/
+
+# ==============================
+# 其他 ArgoCD 相关
+# ==============================
+
+# ApplicationSet 生成的临时清单
+applicationset-*.yaml
+
+# Rollouts 相关（如果使用 Argo Rollouts）
+rollout-*.yaml
+
+# Notifications 配置（如果使用 Argo Notifications）
+argocd-notifications-cm.yaml  # 通常由 Helm 管理，不应提交原始文件
+
+# ==============================
+# 特殊说明：需要显式保留的文件
+# ==============================
+# 以下文件通常需要提交到仓库，因此显式取消忽略：
+!values.yaml
+!kustomization.yaml
+!Chart.yaml
+!Application.yaml
+!ApplicationSet.yaml
+
+# Finder 元数据
+.DS_Store
