@@ -32,6 +32,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `users` (
   `id` bigint NOT NULL,
   `email` varchar(128) NOT NULL,
+  `zitadel_sub` varchar(128) DEFAULT '',
   `password` varchar(255) NOT NULL,
   `status` bigint NOT NULL,
   `activate_time` datetime(3) DEFAULT NULL,
