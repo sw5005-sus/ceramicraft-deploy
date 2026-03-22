@@ -9,4 +9,4 @@ POSTGRES_PORT=5432
 MLFLOW_DB_PASSWORD=password
 
 # notification-ms
-FIREBASE_CREDENTIALS_JSON=
+FIREBASE_CREDENTIALS_JSON={"type":"service_account","project_id":"your-project-id","private_key_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"firebase-adminsdk@your-project-id.iam.gserviceaccount.com","client_id":"...","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token"}
