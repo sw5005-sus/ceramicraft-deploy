@@ -137,7 +137,7 @@ services:
     restart: unless-stopped
 
   order-ms:
-    image: lian1280/ceramicraft-order-mservice:debug-202603212033
+    image: lian1280/ceramicraft-order-mservice:dev-202603260855
     container_name: ceramicraft-order-ms
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
