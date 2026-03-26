@@ -109,7 +109,7 @@ services:
       - redis_data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       timeout: 20s
       retries: 5
       interval: 20s
@@ -164,6 +164,8 @@ services:
       SMTP_EMAIL_FROM: ${SMTP_EMAIL_FROM:-}
       ZITADEL_APP_API_KEY: ${ZITADEL_APP_API_KEY:-}
       ZITADEL_SERVICE_API_KEY: ${ZITADEL_SERVICE_API_KEY:-}
+      ZITADEL_ADMIN_CLIENT_ID: ${ZITADEL_ADMIN_CLIENT_ID:-}
+      ZITADEL_ADMIN_CLIENT_SECRET: ${ZITADEL_ADMIN_CLIENT_SECRET:-}
     volumes:
       - ./config/user-ms.yml:/app/resources/config.yml:ro
     ports:
@@ -277,6 +279,7 @@ services:
       - user-ms
       - comment-ms
       - payment-ms
+      - notification-ms
     restart: unless-stopped
 
   customer-support-agent:

@@ -2,6 +2,21 @@
 
 本地一键启动全部 CeramiCraft 后端服务。
 
+## 前置条件
+
+customer-support-agent 服务是本地构建的，需要先 clone 仓库到与 `ceramicraft-deploy` 同级的目录：
+
+```
+parent/
+├── ceramicraft-deploy/          ← 本仓库
+└── ceramicraft-customer-support-agent/  ← 需要手动 clone
+```
+
+```bash
+# 在 ceramicraft-deploy 的同级目录下
+git clone https://github.com/sw5005-sus/ceramicraft-customer-support-agent.git
+```
+
 ## 快速开始
 
 ```bash
@@ -28,7 +43,7 @@ docker compose ps
 | PostgreSQL | 5432 | 5432 | pg_isready |
 | Kafka | 9092 | 9092 | broker-api-versions |
 | MongoDB | 27017 | 27017 | mongosh ping |
-| Redis | 6379 | 6379 | redis-cli incr |
+| Redis | 6379 | 6379 | redis-cli ping |
 | product-ms | 8080 / 5001 | **8081** / 5011 | /product-ms/v1/ping |
 | order-ms | 8080 / 5001 | **8082** / 5012 | /order-ms/v1/ping |
 | user-ms | 8080 / 5001 | **8083** / 5013 | /user-ms/v1/ping |
@@ -55,6 +70,8 @@ docker compose ps
 |------|------|-----------|
 | `ZITADEL_APP_API_KEY` | Zitadel App API Key（JSON） | Vault `secret/ceramicraft` |
 | `ZITADEL_SERVICE_API_KEY` | Zitadel Service Account Key（JSON） | Vault `secret/ceramicraft` |
+| `ZITADEL_ADMIN_CLIENT_ID` | Zitadel OAuth Client ID（商家登录） | Zitadel Console → App |
+| `ZITADEL_ADMIN_CLIENT_SECRET` | Zitadel OAuth Client Secret | Zitadel Console → App |
 | `OPENAI_API_KEY` | OpenAI API Key | 已有，填到 .env |
 | `SMTP_PASSWORD` | QQ 邮箱 SMTP 授权码 | Vault（可选） |
 | `SMTP_EMAIL_FROM` | 发件人邮箱 | Vault（可选） |
@@ -109,6 +126,6 @@ docker compose down -v
 ## 注意事项
 
 1. **首次启动慢** — MySQL 需要导入 ~35MB 的 order_db.sql，耐心等 1-2 分钟
-2. **customer-support-agent 是本地构建** — 需要 Docker 能访问 `../ceramicraft-customer-support-agent` 目录
+2. **目录结构** — customer-support-agent 是本地构建，需要仓库在 `ceramicraft-deploy` 同级目录（见前置条件）
 3. **S3 图片上传不可用** — product-ms 的 S3 presign 需要 AWS 凭证，本地跳过
-4. **Zitadel 认证** — user-ms 需要 Zitadel API key 才能完成登录流程，不填则登录功能不可用
+4. **Zitadel 认证** — user-ms 需要 4 个 Zitadel 环境变量才能正常工作（API Key + OAuth Client），不填则登录功能不可用
