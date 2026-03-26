@@ -49,6 +49,7 @@ secrets.yaml
 *token*.yaml
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 *.crt
