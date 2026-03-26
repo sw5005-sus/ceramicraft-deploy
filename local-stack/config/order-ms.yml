@@ -1,0 +1,35 @@
+grpc:
+  host: "0.0.0.0"
+  port: 5001
+  connect_timeout: 3
+  max_pool_size: 200
+
+http:
+  host: "0.0.0.0"
+  port: 8080
+
+log:
+  level: debug
+  file_path: ./logs/ceramicraft-order-mservice.log
+
+mysql:
+  host: "mysql"
+  port: "3306"
+  userName: "root"
+  dbName: "order_db"
+
+commodityClient:
+  host: "product-ms"
+  port: 5001
+
+paymentClient:
+  host: "payment-ms"
+  port: 5001
+
+kafka:
+  host: "kafka"
+  port: 9092
+
+redis:
+  host: "redis"
+  port: 6379

@@ -1,0 +1,310 @@
+# CeramiCraft Full Stack - Local Docker Compose
+# =============================================
+# Usage:
+#   1. Copy .env.example to .env and fill in secrets
+#   2. docker compose up -d
+#   3. Wait ~60s for all services to start
+#
+# The Go services read config.yml from their /app/resources mount.
+# This compose uses the container config (config.yml) where hosts
+# point to docker compose service names (e.g., mysql, redis, kafka).
+#
+# We override config.yml at runtime by mounting a generated config
+# that uses compose service names instead of K8s DNS names.
+
+services:
+
+  # ============================================================
+  # INFRASTRUCTURE
+  # ============================================================
+
+  mysql:
+    image: mysql:8.0
+    container_name: ceramicraft-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_PASSWORD:-ceramicraft123}"]
+      timeout: 20s
+      retries: 10
+      interval: 20s
+      start_period: 30s
+
+  postgres:
+    image: postgres:16
+    container_name: ceramicraft-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ceramicraft}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ceramicraft123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-ceramicraft}"]
+      timeout: 20s
+      retries: 10
+      interval: 20s
+      start_period: 30s
+
+  kafka:
+    image: confluentinc/cp-kafka:8.1.0
+    container_name: ceramicraft-kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      timeout: 20s
+      retries: 10
+      interval: 20s
+      start_period: 30s
+
+  mongodb:
+    image: mongo:8.0
+    container_name: ceramicraft-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      timeout: 20s
+      retries: 5
+      interval: 20s
+      start_period: 30s
+
+  redis:
+    image: redis:8.2-alpine
+    container_name: ceramicraft-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      timeout: 20s
+      retries: 5
+      interval: 20s
+      start_period: 30s
+
+  # ============================================================
+  # GO BACKEND SERVICES
+  # ============================================================
+
+  product-ms:
+    image: lian1280/ceramicraft-commodity-mservice:dev-202603191315
+    container_name: ceramicraft-product-ms
+    environment:
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
+    volumes:
+      - ./config/product-ms.yml:/app/resources/config.yml:ro
+    ports:
+      - "8081:8080"
+      - "5011:5001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  order-ms:
+    image: lian1280/ceramicraft-order-mservice:debug-202603212033
+    container_name: ceramicraft-order-ms
+    environment:
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
+    volumes:
+      - ./config/order-ms.yml:/app/resources/config.yml:ro
+    ports:
+      - "8082:8080"
+      - "5012:5001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  user-ms:
+    image: lian1280/ceramicraft-user-mservice:debug-202603212104
+    container_name: ceramicraft-user-ms
+    environment:
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_EMAIL_FROM: ${SMTP_EMAIL_FROM:-}
+      ZITADEL_APP_API_KEY: ${ZITADEL_APP_API_KEY:-}
+      ZITADEL_SERVICE_API_KEY: ${ZITADEL_SERVICE_API_KEY:-}
+    volumes:
+      - ./config/user-ms.yml:/app/resources/config.yml:ro
+    ports:
+      - "8083:8080"
+      - "5013:5001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  comment-ms:
+    image: lian1280/ceramicraft-comment-mservice:dev-202603211948
+    container_name: ceramicraft-comment-ms
+    volumes:
+      - ./config/comment-ms.yml:/app/resources/config.yml:ro
+    ports:
+      - "8084:8080"
+      - "5014:5001"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  payment-ms:
+    image: lian1280/ceramicraft-payment-mservice:dev-202603191458
+    container_name: ceramicraft-payment-ms
+    environment:
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
+    volumes:
+      - ./config/payment-ms.yml:/app/resources/config.yml:ro
+    ports:
+      - "8085:8080"
+      - "5015:5001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ============================================================
+  # PYTHON SERVICES
+  # ============================================================
+
+  log-ms:
+    image: lian1280/ceramicraft-log-mservice:dev-202603260559
+    container_name: ceramicraft-log-ms
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ceramicraft}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ceramicraft123}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      LOG_MSERVICE_HTTP_HOST: 0.0.0.0
+      LOG_MSERVICE_HTTP_PORT: 8080
+      LOG_MSERVICE_GRPC_HOST: "[::]"
+      LOG_MSERVICE_GRPC_PORT: 50051
+    ports:
+      - "8086:8080"
+      - "50061:50051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  notification-ms:
+    image: lian1280/ceramicraft-notification-mservice:dev-202603260559
+    container_name: ceramicraft-notification-ms
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ceramicraft}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ceramicraft123}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      NOTIFICATION_MSERVICE_HTTP_HOST: 0.0.0.0
+      NOTIFICATION_MSERVICE_HTTP_PORT: 8080
+      NOTIFICATION_MSERVICE_GRPC_HOST: "[::]"
+      NOTIFICATION_MSERVICE_GRPC_PORT: 50051
+      FIREBASE_CREDENTIALS_JSON: ${FIREBASE_CREDENTIALS_JSON:-}
+    ports:
+      - "8087:8080"
+      - "50062:50051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mcp-server:
+    image: lian1280/ceramicraft-mcp-server:dev-202603260559
+    container_name: ceramicraft-mcp-server
+    environment:
+      MCP_SERVER_HOST: 0.0.0.0
+      MCP_SERVER_PORT: 8080
+      PRODUCT_MS_HTTP: http://product-ms:8080
+      ORDER_MS_HTTP: http://order-ms:8080
+      USER_MS_HTTP: http://user-ms:8080
+      COMMENT_MS_HTTP: http://comment-ms:8080
+      PAYMENT_MS_HTTP: http://payment-ms:8080
+      NOTIFICATION_MS_HTTP: http://notification-ms:8080
+      MCP_ZITADEL_ISSUER: https://cerami-t6ihrd.us1.zitadel.cloud
+      MCP_ZITADEL_JWKS_URL: https://cerami-t6ihrd.us1.zitadel.cloud/oauth/v2/keys
+    ports:
+      - "8088:8080"
+    depends_on:
+      - product-ms
+      - order-ms
+      - user-ms
+      - comment-ms
+      - payment-ms
+    restart: unless-stopped
+
+  customer-support-agent:
+    build:
+      context: ../../ceramicraft-customer-support-agent
+      dockerfile: Dockerfile
+    container_name: ceramicraft-cs-agent
+    environment:
+      MCP_SERVER_URL: http://mcp-server:8080/mcp
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o}
+      AGENT_HOST: 0.0.0.0
+      AGENT_PORT: 8080
+      LANGSMITH_API_KEY: ${LANGSMITH_API_KEY:-}
+      LANGSMITH_PROJECT: ceramicraft-cs-agent
+    ports:
+      - "8089:8080"
+    depends_on:
+      - mcp-server
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  postgres_data:
+  kafka_data:
+  mongodb_data:
+  redis_data:
