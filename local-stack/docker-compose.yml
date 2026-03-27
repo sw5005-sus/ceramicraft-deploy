@@ -1,5 +1,6 @@
 # CeramiCraft Full Stack - Local Docker Compose
 # =============================================
+name: ceramicraft
 # Usage:
 #   1. Copy .env.example to .env and fill in secrets
 #   2. docker compose up -d
