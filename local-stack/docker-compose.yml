@@ -283,7 +283,7 @@ services:
     restart: unless-stopped
 
   mcp-server:
-    image: lian1280/ceramicraft-mcp-server:dev-202603270727
+    image: lian1280/ceramicraft-mcp-server:dev-202603271133
     container_name: ceramicraft-mcp-server
     environment:
       MCP_SERVER_HOST: 0.0.0.0
