@@ -146,6 +146,7 @@ services:
       VAULT_ADDR: ${VAULT_ADDR}
       VAULT_ROLE_ID: ${VAULT_ROLE_ID}
       VAULT_SECRET_ID: ${VAULT_SECRET_ID}
+      VAULT_SKIP_VERIFY: "true"
     extra_hosts:
       - "vault.local:18.140.49.89"
     volumes:
@@ -178,6 +179,7 @@ services:
       ZITADEL_SERVICE_API_KEY: ${ZITADEL_SERVICE_API_KEY:-}
       ZITADEL_ADMIN_CLIENT_ID: ${ZITADEL_ADMIN_CLIENT_ID:-}
       ZITADEL_ADMIN_CLIENT_SECRET: ${ZITADEL_ADMIN_CLIENT_SECRET:-}
+      VAULT_SKIP_VERIFY: "true"
     extra_hosts:
       - "vault.local:18.140.49.89"
     volumes:
@@ -220,6 +222,7 @@ services:
       VAULT_ADDR: ${VAULT_ADDR}
       VAULT_ROLE_ID: ${VAULT_ROLE_ID}
       VAULT_SECRET_ID: ${VAULT_SECRET_ID}
+      VAULT_SKIP_VERIFY: "true"
     extra_hosts:
       - "vault.local:18.140.49.89"
     volumes:
