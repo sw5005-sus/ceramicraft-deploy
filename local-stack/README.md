@@ -45,7 +45,7 @@ Agent 配置要点：
 |------|---------|-----------|-------------|
 | MySQL | 3306 | 3306 | mysqladmin ping |
 | PostgreSQL | 5432 | 5432 | pg_isready |
-| Kafka | 9092 | 19092 | broker-api-versions |
+| Kafka | 9092 | 9092 | broker-api-versions |
 | MongoDB | 27017 | 27017 | mongosh ping |
 | Redis | 6379 | 6379 | redis-cli ping |
 | product-ms | 8080 / 5001 | **8081** / 5011 | /product-ms/v1/ping |
@@ -127,7 +127,7 @@ docker compose down -v
 1. **首次启动慢** — MySQL 需要导入 ~35MB 的 order_db.sql，耐心等 1-2 分钟
 2. **S3 图片上传不可用** — product-ms 的 S3 presign 需要 AWS 凭证，本地跳过
 3. **Zitadel 认证** — user-ms 需要 4 个 Zitadel 环境变量才能正常工作（API Key + OAuth Client），不填则登录功能不可用
-4. **Kafka 端口** — 宿主机映射为 19092（避免与本地 Kafka 冲突）
+
 
 ## 故障排查
 
@@ -151,7 +151,7 @@ netsh interface ipv4 show excludedportrange protocol=tcp
 
 **解决方案：**
 
-- **方法 1 — 改映射端口**（推荐）：在 `docker-compose.yml` 里把宿主机端口改掉，比如 `9092` → `19092`
+- **方法 1 — 改映射端口**（推荐）：在 `docker-compose.yml` 里把宿主机端口改掉，比如 `3306` → `13306`
 - **方法 2 — 释放保留端口**：
 
   ```powershell
@@ -167,7 +167,7 @@ netsh interface ipv4 show excludedportrange protocol=tcp
   netsh int ipv4 add excludedportrange protocol=tcp startport=9092 numberofports=1
   ```
 
-> 本 compose 已将 Kafka 端口从 9092 改为 19092，如果你遇到其他端口冲突，参照上述方法处理。
+> 如果你遇到端口冲突，参照上述方法处理。
 
 ### `docker compose restart` 不读新的 `.env`
 
