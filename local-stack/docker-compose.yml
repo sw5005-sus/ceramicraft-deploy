@@ -146,6 +146,8 @@ services:
       VAULT_ADDR: ${VAULT_ADDR}
       VAULT_ROLE_ID: ${VAULT_ROLE_ID}
       VAULT_SECRET_ID: ${VAULT_SECRET_ID}
+    extra_hosts:
+      - "vault.local:18.140.49.89"
     volumes:
       - ./config/order-ms.yml:/app/resources/config.yml:ro
     ports:
@@ -176,6 +178,8 @@ services:
       ZITADEL_SERVICE_API_KEY: ${ZITADEL_SERVICE_API_KEY:-}
       ZITADEL_ADMIN_CLIENT_ID: ${ZITADEL_ADMIN_CLIENT_ID:-}
       ZITADEL_ADMIN_CLIENT_SECRET: ${ZITADEL_ADMIN_CLIENT_SECRET:-}
+    extra_hosts:
+      - "vault.local:18.140.49.89"
     volumes:
       - ./config/user-ms.yml:/app/resources/config.yml:ro
     ports:
@@ -216,6 +220,8 @@ services:
       VAULT_ADDR: ${VAULT_ADDR}
       VAULT_ROLE_ID: ${VAULT_ROLE_ID}
       VAULT_SECRET_ID: ${VAULT_SECRET_ID}
+    extra_hosts:
+      - "vault.local:18.140.49.89"
     volumes:
       - ./config/payment-ms.yml:/app/resources/config.yml:ro
     ports:
