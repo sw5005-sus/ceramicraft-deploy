@@ -143,6 +143,8 @@ services:
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
       JWT_SECRET: ${JWT_SECRET}
+      VAULT_ADDR: ${VAULT_ADDR}
+      VAULT_TOKEN: ${VAULT_TOKEN}
     volumes:
       - ./config/order-ms.yml:/app/resources/config.yml:ro
     ports:
@@ -163,6 +165,8 @@ services:
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
       JWT_SECRET: ${JWT_SECRET}
+      VAULT_ADDR: ${VAULT_ADDR}
+      VAULT_TOKEN: ${VAULT_TOKEN}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_EMAIL_FROM: ${SMTP_EMAIL_FROM:-}
       ZITADEL_APP_API_KEY: ${ZITADEL_APP_API_KEY:-}
@@ -206,6 +210,8 @@ services:
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
       JWT_SECRET: ${JWT_SECRET}
+      VAULT_ADDR: ${VAULT_ADDR}
+      VAULT_TOKEN: ${VAULT_TOKEN}
     volumes:
       - ./config/payment-ms.yml:/app/resources/config.yml:ro
     ports:
