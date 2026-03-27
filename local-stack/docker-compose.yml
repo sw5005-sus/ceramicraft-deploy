@@ -144,7 +144,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
       JWT_SECRET: ${JWT_SECRET}
       VAULT_ADDR: ${VAULT_ADDR}
-      VAULT_TOKEN: ${VAULT_TOKEN}
+      VAULT_ROLE_ID: ${VAULT_ROLE_ID}
+      VAULT_SECRET_ID: ${VAULT_SECRET_ID}
     volumes:
       - ./config/order-ms.yml:/app/resources/config.yml:ro
     ports:
@@ -166,9 +167,11 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
       JWT_SECRET: ${JWT_SECRET}
       VAULT_ADDR: ${VAULT_ADDR}
-      VAULT_TOKEN: ${VAULT_TOKEN}
+      VAULT_ROLE_ID: ${VAULT_ROLE_ID}
+      VAULT_SECRET_ID: ${VAULT_SECRET_ID}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_EMAIL_FROM: ${SMTP_EMAIL_FROM:-}
+      RBAC_PROJECT_ID: ${RBAC_PROJECT_ID:-}
       ZITADEL_APP_API_KEY: ${ZITADEL_APP_API_KEY:-}
       ZITADEL_SERVICE_API_KEY: ${ZITADEL_SERVICE_API_KEY:-}
       ZITADEL_ADMIN_CLIENT_ID: ${ZITADEL_ADMIN_CLIENT_ID:-}
@@ -211,7 +214,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
       JWT_SECRET: ${JWT_SECRET}
       VAULT_ADDR: ${VAULT_ADDR}
-      VAULT_TOKEN: ${VAULT_TOKEN}
+      VAULT_ROLE_ID: ${VAULT_ROLE_ID}
+      VAULT_SECRET_ID: ${VAULT_SECRET_ID}
     volumes:
       - ./config/payment-ms.yml:/app/resources/config.yml:ro
     ports:
