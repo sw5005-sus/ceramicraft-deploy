@@ -124,6 +124,7 @@ services:
     container_name: ceramicraft-product-ms
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - ./config/product-ms.yml:/app/resources/config.yml:ro
     ports:
@@ -141,6 +142,7 @@ services:
     container_name: ceramicraft-order-ms
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - ./config/order-ms.yml:/app/resources/config.yml:ro
     ports:
@@ -160,6 +162,7 @@ services:
     container_name: ceramicraft-user-ms
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
+      JWT_SECRET: ${JWT_SECRET}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_EMAIL_FROM: ${SMTP_EMAIL_FROM:-}
       ZITADEL_APP_API_KEY: ${ZITADEL_APP_API_KEY:-}
@@ -183,6 +186,8 @@ services:
   comment-ms:
     image: lian1280/ceramicraft-comment-mservice:dev-202603211948
     container_name: ceramicraft-comment-ms
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - ./config/comment-ms.yml:/app/resources/config.yml:ro
     ports:
@@ -200,6 +205,7 @@ services:
     container_name: ceramicraft-payment-ms
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - ./config/payment-ms.yml:/app/resources/config.yml:ro
     ports:
