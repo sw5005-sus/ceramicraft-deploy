@@ -1,21 +1,8 @@
 # CeramiCraft Local Stack
 
-本地一键启动全部 CeramiCraft 后端服务。
+本地一键启动 CeramiCraft 后端服务（基础设施 + Go 微服务 + Python 微服务）。
 
-## 前置条件
-
-customer-support-agent 服务是本地构建的，需要先 clone 仓库到与 `ceramicraft-deploy` 同级的目录：
-
-```
-parent/
-├── ceramicraft-deploy/          ← 本仓库
-└── ceramicraft-customer-support-agent/  ← 需要手动 clone
-```
-
-```bash
-# 在 ceramicraft-deploy 的同级目录下
-git clone https://github.com/sw5005-sus/ceramicraft-customer-support-agent.git
-```
+> **AI Agent 不包含在本 compose 中。** 每位组员自行启动自己的 Agent 服务，连接本 stack 暴露的 MCP Server（`http://localhost:8088/mcp`）。
 
 ## 快速开始
 
@@ -35,13 +22,30 @@ docker compose up -d
 docker compose ps
 ```
 
+## 连接你的 AI Agent
+
+本 compose 只提供后端基础设施和 MCP Server。AI Agent 需要你单独启动：
+
+```bash
+# 方法 1：Docker（推荐）
+cd ceramicraft-customer-support-agent   # 或你自己的 agent 仓库
+docker compose up -d
+
+# 方法 2：本地直接运行
+uv run python serve.py
+```
+
+Agent 配置要点：
+- **MCP Server URL**: `http://localhost:8088/mcp`（如果 agent 也在 Docker 里，用 `http://host.docker.internal:8088/mcp` 或加入同一网络）
+- **认证**: Agent 透传用户的 Zitadel JWT 到 MCP Server，MCP Server 统一验证
+
 ## 服务端口映射
 
 | 服务 | 容器端口 | 宿主机端口 | Health Check |
 |------|---------|-----------|-------------|
 | MySQL | 3306 | 3306 | mysqladmin ping |
 | PostgreSQL | 5432 | 5432 | pg_isready |
-| Kafka | 9092 | 9092 | broker-api-versions |
+| Kafka | 9092 | 19092 | broker-api-versions |
 | MongoDB | 27017 | 27017 | mongosh ping |
 | Redis | 6379 | 6379 | redis-cli ping |
 | product-ms | 8080 / 5001 | **8081** / 5011 | /product-ms/v1/ping |
@@ -52,7 +56,6 @@ docker compose ps
 | log-ms | 8080 / 50051 | **8086** / 50061 | /log-ms/v1/ping |
 | notification-ms | 8080 / 50051 | **8087** / 50062 | /notification-ms/v1/ping |
 | mcp-server | 8080 | **8088** | /health |
-| cs-agent | 8080 | **8089** | /health |
 
 ## 环境变量说明
 
@@ -72,11 +75,9 @@ docker compose ps
 | `ZITADEL_SERVICE_API_KEY` | Zitadel Service Account Key（JSON） | Vault `secret/ceramicraft` |
 | `ZITADEL_ADMIN_CLIENT_ID` | Zitadel OAuth Client ID（商家登录） | Zitadel Console → App |
 | `ZITADEL_ADMIN_CLIENT_SECRET` | Zitadel OAuth Client Secret | Zitadel Console → App |
-| `OPENAI_API_KEY` | OpenAI API Key | 已有，填到 .env |
 | `SMTP_PASSWORD` | QQ 邮箱 SMTP 授权码 | Vault（可选） |
 | `SMTP_EMAIL_FROM` | 发件人邮箱 | Vault（可选） |
 | `FIREBASE_CREDENTIALS_JSON` | FCM 推送凭证 JSON | Vault（可选） |
-| `LANGSMITH_API_KEY` | LangSmith 追踪（可选） | langsmith.com |
 
 ## 架构
 
@@ -96,12 +97,15 @@ docker compose ps
                     │  ┌────────────────┴───────────────────────┐ │
                     │  │  Python Services                       │ │
                     │  │  log-ms │ notification-ms │ mcp-server │ │
-                    │  └────────────────┬───────────────────────┘ │
-                    │                   │ MCP (Streamable HTTP)   │
-                    │  ┌────────────────┴───────────────────────┐ │
-                    │  │  customer-support-agent                │ │
                     │  └────────────────────────────────────────┘ │
-                    └─────────────────────────────────────────────┘
+                    └──────────────────┬──────────────────────────┘
+                                       │ MCP (Streamable HTTP)
+                                       │ http://localhost:8088/mcp
+                                       ▼
+                    ┌──────────────────────────────────────────────┐
+                    │  AI Agents（各自独立部署）                      │
+                    │  e.g. customer-support-agent :8089            │
+                    └──────────────────────────────────────────────┘
 ```
 
 ## 常用命令
@@ -126,6 +130,6 @@ docker compose down -v
 ## 注意事项
 
 1. **首次启动慢** — MySQL 需要导入 ~35MB 的 order_db.sql，耐心等 1-2 分钟
-2. **目录结构** — customer-support-agent 是本地构建，需要仓库在 `ceramicraft-deploy` 同级目录（见前置条件）
-3. **S3 图片上传不可用** — product-ms 的 S3 presign 需要 AWS 凭证，本地跳过
-4. **Zitadel 认证** — user-ms 需要 4 个 Zitadel 环境变量才能正常工作（API Key + OAuth Client），不填则登录功能不可用
+2. **S3 图片上传不可用** — product-ms 的 S3 presign 需要 AWS 凭证，本地跳过
+3. **Zitadel 认证** — user-ms 需要 4 个 Zitadel 环境变量才能正常工作（API Key + OAuth Client），不填则登录功能不可用
+4. **Kafka 端口** — 宿主机映射为 19092（避免与本地 Kafka 冲突）
