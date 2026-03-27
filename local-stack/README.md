@@ -37,7 +37,7 @@ uv run python serve.py
 
 Agent 配置要点：
 - **MCP Server URL**: `http://localhost:8088/mcp`
-- 如果 agent 也在 Docker 里，需要加入同一网络（`docker compose` 默认网络名为 `ceramicraft_default`），然后用 `http://mcp-server:8080/mcp`
+- 如果 agent 也在 Docker 里，可以通过 `docker network connect` 将 agent 容器接入本 stack 的网络，然后用 `http://mcp-server:8080/mcp`（容器内部端口）
 - **认证**: Agent 透传用户的 Zitadel JWT 到 MCP Server，MCP Server 统一验证
 
 ## 服务端口映射
