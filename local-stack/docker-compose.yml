@@ -217,7 +217,7 @@ services:
   # ============================================================
 
   log-ms:
-    image: lian1280/ceramicraft-log-mservice:dev-202603260559
+    image: lian1280/ceramicraft-log-mservice:dev-202603270727
     container_name: ceramicraft-log-ms
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-ceramicraft}
@@ -237,7 +237,7 @@ services:
     restart: unless-stopped
 
   notification-ms:
-    image: lian1280/ceramicraft-notification-mservice:dev-202603260559
+    image: lian1280/ceramicraft-notification-mservice:dev-202603270727
     container_name: ceramicraft-notification-ms
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-ceramicraft}
@@ -258,7 +258,7 @@ services:
     restart: unless-stopped
 
   mcp-server:
-    image: lian1280/ceramicraft-mcp-server:dev-202603260559
+    image: lian1280/ceramicraft-mcp-server:dev-202603270727
     container_name: ceramicraft-mcp-server
     environment:
       MCP_SERVER_HOST: 0.0.0.0
