@@ -133,3 +133,61 @@ docker compose down -v
 2. **S3 图片上传不可用** — product-ms 的 S3 presign 需要 AWS 凭证，本地跳过
 3. **Zitadel 认证** — user-ms 需要 4 个 Zitadel 环境变量才能正常工作（API Key + OAuth Client），不填则登录功能不可用
 4. **Kafka 端口** — 宿主机映射为 19092（避免与本地 Kafka 冲突）
+
+## 故障排查
+
+### 端口被占用
+
+Windows 上某些端口可能被系统服务占用（如 Hyper-V 保留端口），导致容器启动失败：
+
+```
+Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:9092 -> 0.0.0.0:0: listen tcp 0.0.0.0:9092: bind: An attempt was made to access a socket in a way forbidden by its access permissions.
+```
+
+**排查步骤：**
+
+```powershell
+# 1. 查看哪个进程占了端口
+netstat -ano | findstr :<端口号>
+
+# 2. 查看 Hyper-V / WSL 保留的端口范围
+netsh interface ipv4 show excludedportrange protocol=tcp
+```
+
+**解决方案：**
+
+- **方法 1 — 改映射端口**（推荐）：在 `docker-compose.yml` 里把宿主机端口改掉，比如 `9092` → `19092`
+- **方法 2 — 释放保留端口**：
+
+  ```powershell
+  # 管理员权限运行
+  net stop winnat
+  net start winnat
+  ```
+
+- **方法 3 — 排除端口不被保留**：
+
+  ```powershell
+  # 管理员权限运行，永久排除某端口
+  netsh int ipv4 add excludedportrange protocol=tcp startport=9092 numberofports=1
+  ```
+
+> 本 compose 已将 Kafka 端口从 9092 改为 19092，如果你遇到其他端口冲突，参照上述方法处理。
+
+### `docker compose restart` 不读新的 `.env`
+
+修改 `.env` 后，用 `restart` 不会重读环境变量。必须用：
+
+```bash
+docker compose up -d
+```
+
+这会重建受影响的容器并应用新的环境变量。
+
+### Vault 连接问题
+
+Go 服务（order-ms / payment-ms / user-ms）启动时需要连 Vault 拉取配置。如果 Vault 不可达，服务会启动失败。
+
+- 确认 `.env` 中 `VAULT_ADDR`、`VAULT_ROLE_ID`、`VAULT_SECRET_ID` 已正确填写
+- 如果 Vault 使用自签证书，确保 `VAULT_SKIP_VERIFY=true` 已设置
+- Vault TLS 证书签给 `vault.local` 域名，compose 中已配置 `extra_hosts` 映射
