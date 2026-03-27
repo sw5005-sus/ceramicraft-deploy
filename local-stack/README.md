@@ -36,7 +36,8 @@ uv run python serve.py
 ```
 
 Agent 配置要点：
-- **MCP Server URL**: `http://localhost:8088/mcp`（如果 agent 也在 Docker 里，用 `http://host.docker.internal:8088/mcp` 或加入同一网络）
+- **MCP Server URL**: `http://localhost:8088/mcp`
+- 如果 agent 也在 Docker 里，需要加入同一网络（`docker compose` 默认网络名为 `ceramicraft_default`），然后用 `http://mcp-server:8080/mcp`
 - **认证**: Agent 透传用户的 Zitadel JWT 到 MCP Server，MCP Server 统一验证
 
 ## 服务端口映射
@@ -71,13 +72,18 @@ Agent 配置要点：
 
 | 变量 | 说明 | 从哪里获取 |
 |------|------|-----------|
+| `JWT_SECRET` | Go 服务共用的 JWT 签名密钥 | 自行生成或从 Vault |
+| `VAULT_ADDR` | Vault 地址 | 默认 `http://vault.local:8200`，HTTPS 需改 |
+| `VAULT_ROLE_ID` | Vault AppRole Role ID | Vault 管理员提供 |
+| `VAULT_SECRET_ID` | Vault AppRole Secret ID | Vault 管理员提供 |
 | `ZITADEL_APP_API_KEY` | Zitadel App API Key（JSON） | Vault `secret/ceramicraft` |
 | `ZITADEL_SERVICE_API_KEY` | Zitadel Service Account Key（JSON） | Vault `secret/ceramicraft` |
 | `ZITADEL_ADMIN_CLIENT_ID` | Zitadel OAuth Client ID（商家登录） | Zitadel Console → App |
 | `ZITADEL_ADMIN_CLIENT_SECRET` | Zitadel OAuth Client Secret | Zitadel Console → App |
-| `SMTP_PASSWORD` | QQ 邮箱 SMTP 授权码 | Vault（可选） |
-| `SMTP_EMAIL_FROM` | 发件人邮箱 | Vault（可选） |
-| `FIREBASE_CREDENTIALS_JSON` | FCM 推送凭证 JSON | Vault（可选） |
+| `RBAC_PROJECT_ID` | Zitadel RBAC Project ID（可选） | Zitadel Console |
+| `SMTP_PASSWORD` | QQ 邮箱 SMTP 授权码（可选） | Vault |
+| `SMTP_EMAIL_FROM` | 发件人邮箱（可选） | Vault |
+| `FIREBASE_CREDENTIALS_JSON` | FCM 推送凭证 JSON（可选） | Vault |
 
 ## 架构
 
@@ -184,5 +190,5 @@ docker compose up -d
 Go 服务（order-ms / payment-ms / user-ms）启动时需要连 Vault 拉取配置。如果 Vault 不可达，服务会启动失败。
 
 - 确认 `.env` 中 `VAULT_ADDR`、`VAULT_ROLE_ID`、`VAULT_SECRET_ID` 已正确填写
-- 如果 Vault 使用自签证书，确保 `VAULT_SKIP_VERIFY=true` 已设置
-- Vault TLS 证书签给 `vault.local` 域名，compose 中已配置 `extra_hosts` 映射
+- 默认 `VAULT_ADDR=http://vault.local:8200`；如果 Vault 用 HTTPS + 自签证书，compose 中已设置 `VAULT_SKIP_VERIFY=true`
+- Vault TLS 证书签给 `vault.local` 域名，compose 中已配置 `extra_hosts` 将其解析到实际 IP
