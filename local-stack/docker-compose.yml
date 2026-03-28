@@ -362,4 +362,3 @@ volumes:
   kafka_data:
   mongodb_data:
   redis_data:
-  vault_data:
