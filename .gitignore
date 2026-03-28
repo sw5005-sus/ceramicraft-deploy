@@ -142,4 +142,4 @@ argocd-notifications-cm.yaml  # 通常由 Helm 管理，不应提交原始文件
 !ApplicationSet.yaml
 
 # Finder 元数据
-.DS_Store
+.DS_Store.secrets/
