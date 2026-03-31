@@ -154,7 +154,7 @@ services:
   # ============================================================
 
   product-ms:
-    image: lian1280/ceramicraft-commodity-mservice:dev-202603191315
+    image: lian1280/ceramicraft-commodity-mservice:dev-202603291938
     container_name: ceramicraft-product-ms
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
@@ -172,7 +172,7 @@ services:
     restart: unless-stopped
 
   order-ms:
-    image: lian1280/ceramicraft-order-mservice:dev-202603260855
+    image: lian1280/ceramicraft-order-mservice:dev-202603302248
     container_name: ceramicraft-order-ms
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
@@ -197,7 +197,7 @@ services:
     restart: unless-stopped
 
   user-ms:
-    image: lian1280/ceramicraft-user-mservice:debug-202603212104
+    image: lian1280/ceramicraft-user-mservice:v202603291933
     container_name: ceramicraft-user-ms
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
@@ -229,7 +229,7 @@ services:
     restart: unless-stopped
 
   comment-ms:
-    image: lian1280/ceramicraft-comment-mservice:dev-202603211948
+    image: lian1280/ceramicraft-comment-mservice:debug-202603291606
     container_name: ceramicraft-comment-ms
     environment:
       JWT_SECRET: ${JWT_SECRET}
@@ -246,7 +246,7 @@ services:
     restart: unless-stopped
 
   payment-ms:
-    image: lian1280/ceramicraft-payment-mservice:dev-202603191458
+    image: lian1280/ceramicraft-payment-mservice:dev-202603291946
     container_name: ceramicraft-payment-ms
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
