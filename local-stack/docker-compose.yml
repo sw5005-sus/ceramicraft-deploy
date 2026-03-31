@@ -352,6 +352,33 @@ services:
   # exposed by this stack (default: http://localhost:8088/mcp).
   # ──────────────────────────────────────────────────────────────
 
+  # ============================================================
+  # MLFLOW
+  # ============================================================
+
+  mlflow:
+    image: lian1280/mlflow:v3.10.1
+    container_name: ceramicraft-mlflow
+    command:
+      - mlflow
+      - server
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "5000"
+      - "--workers"
+      - "1"
+      - "--backend-store-uri"
+      - "postgresql://mlflow_user:${MLFLOW_DB_PASSWORD:-MlflowDefaultPass2026!}@postgres:5432/mlflow_db"
+      - "--default-artifact-root"
+      - "mlflow-artifacts:/"
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
 networks:
   default:
     driver: bridge
