@@ -14,6 +14,7 @@ cd ceramicraft-deploy/local-stack
 cp .env.example .env
 
 # 3. 编辑 .env，填入必要的密钥（见下方说明）
+#    服务镜像 tag 已预填当前推荐版本，按需修改
 
 # 4. 启动全部服务
 docker compose up -d
