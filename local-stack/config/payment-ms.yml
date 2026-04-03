@@ -23,3 +23,7 @@ kafka:
   group_id: "ceramicraft-payment-group"
   max_bytes: 10485760
   commit_interval: 0
+
+audit_grpc:
+  host: "ceramicraft-log-ms"
+  port: 50051

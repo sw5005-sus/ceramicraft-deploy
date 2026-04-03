@@ -33,3 +33,11 @@ kafka:
 redis:
   host: "redis"
   port: 6379
+
+auditClient:
+  host: "log-ms"
+  port: 50051
+
+pushClient:
+  host: "notification-ms"
+  port: 50051

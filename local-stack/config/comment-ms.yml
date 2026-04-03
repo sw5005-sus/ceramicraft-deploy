@@ -12,6 +12,12 @@ log:
   level: debug
   file_path: ./logs/ceramicraft-comment-mservice.log
 
+mysql:
+  host: "mysql"
+  port: "3306"
+  userName: "root"
+  dbName: "comment_db"
+
 mongo:
   host: "mongodb"
   port: "27017"
@@ -20,3 +26,7 @@ mongo:
 redis:
   host: "redis"
   port: 6379
+
+audit_grpc:
+  host: "ceramicraft-log-ms"
+  port: 50051
