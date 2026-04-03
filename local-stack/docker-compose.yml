@@ -293,7 +293,7 @@ services:
     restart: unless-stopped
 
   notification-ms:
-    image: lian1280/ceramicraft-notification-mservice:dev-202603270727
+    image: lian1280/ceramicraft-notification-mservice:dev-202604030131
     container_name: ceramicraft-notification-ms
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-ceramicraft}
