@@ -359,6 +359,8 @@ services:
   mlflow:
     image: lian1280/mlflow:v3.10.1
     container_name: ceramicraft-mlflow
+    environment:
+      MLFLOW_SERVER_ALLOWED_HOSTS: "*"
     command:
       - "--host"
       - "0.0.0.0"
@@ -366,7 +368,6 @@ services:
       - "5000"
       - "--workers"
       - "1"
-      - "--dev"
       - "--backend-store-uri"
       - "postgresql://mlflow_user:${MLFLOW_DB_PASSWORD:-MlflowDefaultPass2026!}@postgres:5432/mlflow_db"
       - "--default-artifact-root"
