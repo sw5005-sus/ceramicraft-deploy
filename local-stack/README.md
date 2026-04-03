@@ -74,6 +74,23 @@ Agent 配置要点：
 | `POSTGRES_USER` | `ceramicraft` | PostgreSQL 用户名 |
 | `POSTGRES_PASSWORD` | `ceramicraft123` | PostgreSQL 密码 |
 
+### 服务镜像 Tag
+
+`.env.example` 中预填了各服务当前推荐的镜像版本，格式为 `dev-YYYYMMDDHHMM` 或 `debug-YYYYMMDDHHMM`。
+
+| 变量 | 对应服务 |
+|------|---------|
+| `PRODUCT_MS_TAG` | ceramicraft-commodity-mservice |
+| `ORDER_MS_TAG` | ceramicraft-order-mservice |
+| `USER_MS_TAG` | ceramicraft-user-mservice |
+| `COMMENT_MS_TAG` | ceramicraft-comment-mservice |
+| `PAYMENT_MS_TAG` | ceramicraft-payment-mservice |
+| `LOG_MS_TAG` | ceramicraft-log-mservice |
+| `NOTIFICATION_MS_TAG` | ceramicraft-notification-mservice |
+| `MCP_SERVER_TAG` | ceramicraft-mcp-server |
+
+每次某个服务有新 deploy，更新 `.env` 中对应的 tag，然后 `docker compose up -d <service>` 即可。
+
 ### Vault（本地 dev 模式，无需配置）
 
 Vault 以 dev 模式运行在 compose 内部，Go 服务自动连接，**无需手动配置**。
