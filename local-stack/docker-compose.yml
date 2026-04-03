@@ -338,20 +338,6 @@ services:
       - notification-ms
     restart: unless-stopped
 
-  # ─── AI Agents ────────────────────────────────────────────────
-  # AI Agent services (e.g. customer-support-agent) are NOT included
-  # in this compose file. Each team member should run their own agent
-  # locally against the shared backend stack.
-  #
-  # Example — run customer-support-agent alongside this stack:
-  #
-  #   cd ceramicraft-customer-support-agent
-  #   docker compose up -d          # or: uv run python serve.py
-  #
-  # Make sure your agent's MCP_SERVER_URL points to the MCP Server
-  # exposed by this stack (default: http://localhost:8088/mcp).
-  # ──────────────────────────────────────────────────────────────
-
   # ============================================================
   # MLFLOW
   # ============================================================
