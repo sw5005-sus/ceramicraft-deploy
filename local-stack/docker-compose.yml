@@ -43,6 +43,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-ceramicraft}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ceramicraft123}
+      MLFLOW_DB_PASSWORD: ${MLFLOW_DB_PASSWORD:-MlflowDefaultPass2026!}
     ports:
       - "5432:5432"
     volumes:
