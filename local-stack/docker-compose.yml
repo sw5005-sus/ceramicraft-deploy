@@ -93,12 +93,7 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-    entrypoint: ["sh", "-c", "
-      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-activated --partitions 1 --replication-factor 1 &&
-      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic order_created --partitions 1 --replication-factor 1 &&
-      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic order_status_changed --partitions 1 --replication-factor 1 &&
-      echo 'Kafka topics created successfully'
-    "]
+    entrypoint: ["sh", "-c", "kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-activated --partitions 1 --replication-factor 1 && kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic order_created --partitions 1 --replication-factor 1 && kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic order_status_changed --partitions 1 --replication-factor 1 && echo 'Kafka topics created successfully'"]
     restart: "no"
 
   mongodb:
