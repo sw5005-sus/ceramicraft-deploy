@@ -249,7 +249,7 @@ services:
   payment-ms:
     image: lian1280/ceramicraft-payment-mservice:${PAYMENT_MS_TAG}
     container_name: ceramicraft-payment-ms
-    entrypoint: ["sh", "-c", "sleep 30 && ./main"]
+    entrypoint: ["sh", "-c", "echo 'Waiting 90s for dependencies...' && sleep 90 && ./main"]
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
       JWT_SECRET: ${JWT_SECRET}
