@@ -130,6 +130,9 @@ Vault 以 dev 模式运行在 compose 内部，Go 服务自动连接，**无需�
 │    Vault · MySQL · Postgres · Kafka              │
 │    MongoDB · Redis                               │
 │                       │                          │
+│  Init Containers:     │                          │
+│    vault-init · kafka-init (pre-create topics)   │
+│                       │                          │
 │  Go Services:         │ HTTP                     │
 │    product · order · user · comment · payment    │
 │                       │                          │
