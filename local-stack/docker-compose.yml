@@ -87,6 +87,20 @@ services:
       interval: 20s
       start_period: 30s
 
+  kafka-init:
+    image: confluentinc/cp-kafka:8.1.0
+    container_name: ceramicraft-kafka-init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["sh", "-c", "
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-activated --partitions 1 --replication-factor 1 &&
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic order_created --partitions 1 --replication-factor 1 &&
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic order_status_changed --partitions 1 --replication-factor 1 &&
+      echo 'Kafka topics created successfully'
+    "]
+    restart: "no"
+
   mongodb:
     image: mongo:8.0
     container_name: ceramicraft-mongodb
@@ -249,7 +263,6 @@ services:
   payment-ms:
     image: lian1280/ceramicraft-payment-mservice:${PAYMENT_MS_TAG}
     container_name: ceramicraft-payment-ms
-    entrypoint: ["sh", "-c", "echo 'Waiting 90s for dependencies...' && sleep 90 && ./main"]
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ceramicraft123}
       JWT_SECRET: ${JWT_SECRET}
@@ -264,8 +277,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      kafka:
-        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
       vault-init:
         condition: service_completed_successfully
     restart: unless-stopped
