@@ -82,6 +82,7 @@ services:
         kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-activated --partitions 1 --replication-factor 1 &&
         kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic order_created --partitions 1 --replication-factor 1 &&
         kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic order_status_changed --partitions 1 --replication-factor 1 &&
+        kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic product_changed --partitions 1 --replication-factor 1 &&
         echo 'Kafka topics created successfully'
     restart: "no"
   mongodb:
@@ -99,7 +100,7 @@ services:
       interval: 20s
       start_period: 30s
   redis:
-    image: redis:8.2-alpine
+    image: redis/redis-stack-server:latest
     container_name: redis-container
     ports:
       - "6379:6379"
